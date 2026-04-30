@@ -190,6 +190,29 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 # http://localhost:8000/docs
 ```
 
+### Windows PowerShell 안정 실행 런북 (문제 재발 시)
+
+```powershell
+# 0) backend로 이동
+cd C:\Users\keti\OneDrive\문서\GitHub\kmx\backend
+
+# 1) 가상환경 생성 (최초 1회)
+py -3 -m venv .venv
+
+# 2) 가상환경 python으로 의존성 설치 (activate 없이도 가능)
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# 3) 서버 실행 (권장: 127.0.0.1 바인딩)
+.\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+체크포인트:
+
+- `.\.venv\Scripts\python.exe` 경로 오류가 나면 현재 위치가 `backend`인지 먼저 확인합니다.
+- `http://127.0.0.1:8000/docs`가 아닌 다른 화면이 뜨면 8000 포트를 다른 앱이 점유한 상태일 수 있습니다.
+- 점유 확인: `netstat -ano | findstr :8000`
+
 ### 방법 2: Docker Compose (운영 권장)
 
 ```bash
@@ -218,74 +241,101 @@ python3 test_core.py
 ### 베이스 URL: `http://localhost:8000/api/v1`
 
 #### 🔐 Identity (DID/VC)
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/identity/did` | DID 생성 |
-| GET | `/identity/did/{did}` | DID 조회 |
-| POST | `/identity/vc` | VC 발급 |
-| GET | `/identity/vc/{vc_id}/verify` | VC 검증 |
-| POST | `/identity/vc/delegate` | 에이전트 위임 VC 발급 |
+
+
+| Method | Path                          | 설명            |
+| ------ | ----------------------------- | ------------- |
+| POST   | `/identity/did`               | DID 생성        |
+| GET    | `/identity/did/{did}`         | DID 조회        |
+| POST   | `/identity/vc`                | VC 발급         |
+| GET    | `/identity/vc/{vc_id}/verify` | VC 검증         |
+| POST   | `/identity/vc/delegate`       | 에이전트 위임 VC 발급 |
+
 
 #### 🔗 Connector (EDC)
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/connector/register` | 커넥터 등록 |
-| GET | `/connector/list` | 커넥터 목록 |
-| POST | `/connector/negotiate` | 계약 협상 시작 |
-| POST | `/connector/data/register` | 데이터셋 등록 |
-| POST | `/connector/data/transfer` | 데이터 P2P 전송 |
+
+
+| Method | Path                       | 설명         |
+| ------ | -------------------------- | ---------- |
+| POST   | `/connector/register`      | 커넥터 등록     |
+| GET    | `/connector/list`          | 커넥터 목록     |
+| POST   | `/connector/negotiate`     | 계약 협상 시작   |
+| POST   | `/connector/data/register` | 데이터셋 등록    |
+| POST   | `/connector/data/transfer` | 데이터 P2P 전송 |
+
 
 #### 📋 Policy (ODRL)
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/policy/` | 정책 생성 |
-| GET | `/policy/` | 정책 목록 |
-| POST | `/policy/evaluate` | 정책 평가 |
+
+
+| Method | Path               | 설명    |
+| ------ | ------------------ | ----- |
+| POST   | `/policy/`         | 정책 생성 |
+| GET    | `/policy/`         | 정책 목록 |
+| POST   | `/policy/evaluate` | 정책 평가 |
+
 
 #### 📝 Contract
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/contract/` | 계약 생성 |
-| POST | `/contract/{id}/sign` | 계약 서명 |
-| GET | `/contract/{id}/verify` | 계약 검증 |
+
+
+| Method | Path                    | 설명    |
+| ------ | ----------------------- | ----- |
+| POST   | `/contract/`            | 계약 생성 |
+| POST   | `/contract/{id}/sign`   | 계약 서명 |
+| GET    | `/contract/{id}/verify` | 계약 검증 |
+
 
 #### 🏷️ Metadata
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/metadata/extract` | 메타데이터 추출/저장 |
-| GET | `/metadata/` | 데이터셋 카탈로그 |
-| POST | `/metadata/ontology/map` | 온톨로지 매핑 |
-| GET | `/metadata/ontology/concepts` | 온톨로지 개념 목록 |
+
+
+| Method | Path                          | 설명          |
+| ------ | ----------------------------- | ----------- |
+| POST   | `/metadata/extract`           | 메타데이터 추출/저장 |
+| GET    | `/metadata/`                  | 데이터셋 카탈로그   |
+| POST   | `/metadata/ontology/map`      | 온톨로지 매핑     |
+| GET    | `/metadata/ontology/concepts` | 온톨로지 개념 목록  |
+
 
 #### 🤖 AI
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/ai/predict` | AI 예측 실행 |
-| GET | `/ai/models` | 모델 목록 |
-| GET | `/ai/models/{type}/metadata` | 모델 메타데이터 |
-| GET | `/ai/models/{type}/health` | 모델 상태 |
+
+
+| Method | Path                         | 설명       |
+| ------ | ---------------------------- | -------- |
+| POST   | `/ai/predict`                | AI 예측 실행 |
+| GET    | `/ai/models`                 | 모델 목록    |
+| GET    | `/ai/models/{type}/metadata` | 모델 메타데이터 |
+| GET    | `/ai/models/{type}/health`   | 모델 상태    |
+
 
 #### 🤖 Agent (Agentic AI)
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/agent/initialize` | 에이전트 초기화 |
-| POST | `/agent/delegate` | 권한 위임 |
-| POST | `/agent/auto-catalog` | 자동 카탈로그 생성 |
-| GET | `/agent/health` | 에이전트 상태 |
+
+
+| Method | Path                  | 설명         |
+| ------ | --------------------- | ---------- |
+| POST   | `/agent/initialize`   | 에이전트 초기화   |
+| POST   | `/agent/delegate`     | 권한 위임      |
+| POST   | `/agent/auto-catalog` | 자동 카탈로그 생성 |
+| GET    | `/agent/health`       | 에이전트 상태    |
+
 
 #### 🔍 Search
-| Method | Path | 설명 |
-|--------|------|------|
-| POST | `/search/datasets` | 자연어 데이터셋 검색 |
-| GET | `/search/datasets?q={query}` | 키워드 검색 |
-| POST | `/search/ontology` | 온톨로지 기반 검색 |
+
+
+| Method | Path                         | 설명          |
+| ------ | ---------------------------- | ----------- |
+| POST   | `/search/datasets`           | 자연어 데이터셋 검색 |
+| GET    | `/search/datasets?q={query}` | 키워드 검색      |
+| POST   | `/search/ontology`           | 온톨로지 기반 검색  |
+
 
 #### 📊 Clearing House
-| Method | Path | 설명 |
-|--------|------|------|
-| GET | `/clearinghouse/logs` | 전송 로그 조회 |
-| GET | `/clearinghouse/verify-chain` | 해시체인 무결성 검증 |
-| GET | `/clearinghouse/usage-report` | 사용량 정산 보고서 |
+
+
+| Method | Path                          | 설명          |
+| ------ | ----------------------------- | ----------- |
+| GET    | `/clearinghouse/logs`         | 전송 로그 조회    |
+| GET    | `/clearinghouse/verify-chain` | 해시체인 무결성 검증 |
+| GET    | `/clearinghouse/usage-report` | 사용량 정산 보고서  |
+
 
 ---
 
@@ -333,23 +383,27 @@ echo "Policy ID: $POLICY_ID"
 
 ## 표준 준수 사항
 
-| 표준 | 구현 내용 |
-|------|-----------|
-| **W3C DID Core 1.0** | `did:kmx:` 메서드, DID Document 구조 |
-| **W3C VC Data Model 1.1** | VC 발급/검증, Ed25519 서명 |
-| **ODRL 2.2** | Permission/Prohibition/Obligation, ODRL JSON-LD |
-| **DCAT 2** | 데이터셋 메타데이터, Distribution 구조 |
-| **IDS-RAM** | Control/Data Plane 분리, Contract 협상 프로토콜 |
-| **ISO 62443** | 산업 사이버보안 (아키텍처 반영) |
+
+| 표준                        | 구현 내용                                           |
+| ------------------------- | ----------------------------------------------- |
+| **W3C DID Core 1.0**      | `did:kmx:` 메서드, DID Document 구조                 |
+| **W3C VC Data Model 1.1** | VC 발급/검증, Ed25519 서명                            |
+| **ODRL 2.2**              | Permission/Prohibition/Obligation, ODRL JSON-LD |
+| **DCAT 2**                | 데이터셋 메타데이터, Distribution 구조                     |
+| **IDS-RAM**               | Control/Data Plane 분리, Contract 협상 프로토콜         |
+| **ISO 62443**             | 산업 사이버보안 (아키텍처 반영)                              |
+
 
 ---
 
 ## 환경 변수
 
-| 변수 | 기본값 | 설명 |
-|------|--------|------|
-| `DATABASE_URL` | `sqlite+aiosqlite:///./kmx_platform.db` | DB 연결 문자열 |
-| `CONNECTOR_ID` | 자동생성 | 이 인스턴스의 커넥터 ID |
+
+| 변수             | 기본값                                     | 설명             |
+| -------------- | --------------------------------------- | -------------- |
+| `DATABASE_URL` | `sqlite+aiosqlite:///./kmx_platform.db` | DB 연결 문자열      |
+| `CONNECTOR_ID` | 자동생성                                    | 이 인스턴스의 커넥터 ID |
+
 
 ---
 
